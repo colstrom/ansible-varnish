@@ -1,0 +1,6 @@
+---
+- include: repositories.yml
+- include: packages.yml
+- include: monitoring.yml
+- include: config.yml
+- include: services.yml

@@ -1,0 +1,14 @@
+---
+- name: Upload Config | monit | varnish
+  template:
+    src: etc/monit/conf.d/varnish
+    dest: /etc/monit/conf.d/varnish
+  notify: Reload Service | monit
+
+- name: Trigger All Callbacks
+  meta: flush_handlers
+
+- name: Confirm Monitoring | varnish
+  monit:
+    state: present
+    name: varnish

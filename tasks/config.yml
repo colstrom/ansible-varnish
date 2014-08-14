@@ -1,0 +1,9 @@
+---
+- name: Upload Config | varnish
+  template:
+    src: etc/varnish/default.vcl
+    dest: /etc/varnish/default.vcl
+    owner: root
+    group: wcadmin
+    mode: 0664
+  notify: Reload Service | varnish

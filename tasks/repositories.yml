@@ -1,0 +1,14 @@
+---
+- name: Import Signing Key | Varnish
+  apt_key:
+    state: present
+    url: 'http://repo.varnish-cache.org/debian/GPG-key.txt'
+
+- name: Import Repository | Varnish
+  apt_repository:
+    state: present
+    repo: 'deb http://repo.varnish-cache.org/ubuntu/ precise varnish-4.0'
+  notify: Update Package Cache
+
+- name: Trigger All Callbacks
+  meta: flush_handlers
