@@ -1,5 +1,4 @@
 ---
-- include: install.yml
 - include: monitoring.yml
 - include: config.yml
-- include: services.yml
+- include: install.yml
