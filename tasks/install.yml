@@ -12,3 +12,10 @@
 
 - name: Trigger All Callbacks
   meta: flush_handlers
+
+- name: Install Packages | apt
+  apt:
+    state: latest
+    pkg: "{{ item }}"
+  with_items:
+    - varnish
