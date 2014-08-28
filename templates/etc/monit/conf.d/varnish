@@ -1,4 +1,4 @@
-check process varnish with pidfile /var/run/varnishd.pid
+check process varnish with pidfile {{ varnish_pidfile_path }}
   start program "/usr/sbin/service varnish start"
   stop program "/usr/sbin/service varnish stop"
   if 5 restarts within 5 cycles then timeout

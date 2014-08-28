@@ -8,6 +8,17 @@
 - name: Trigger All Callbacks
   meta: flush_handlers
 
+- name: Configure | varnish | initscript | pidfile
+  replace:
+    dest: /etc/init.d/varnish
+    regexp: '/var/run/\$NAME.pid'
+    replace: "{{ varnish_pidfile_path }}"
+  tags:
+    - initscript
+    - runtime-data
+    - pidfile
+    - varnish
+
 - name: Confirm Monitoring | varnish
   monit:
     state: present

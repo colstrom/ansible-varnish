@@ -1,0 +1,6 @@
+---
+varnish_runtime_root: "{{ runtime_root }}/varnish"
+varnish_pidfile_path: "{{ varnish_runtime_root }}/varnishd.pid"
+
+varnish_default_backend_host: localhost
+varnish_default_backend_port: 80
