@@ -1,12 +1,21 @@
 ---
+- name: "Directory Exists | {{ varnish_runtime_root }}"
+  file:
+    state: directory
+    path: "{{ varnish_runtime_root }}"
+    owner: root
+    group: wcadmin
+    mode: 0775
+  tags:
+    - directory-structure
+    - runtime-data
+    - varnish
+
 - name: Upload Config | monit | varnish
   template:
     src: etc/monit/conf.d/varnish
     dest: /etc/monit/conf.d/varnish
   notify: Reload Service | monit
-
-- name: Trigger All Callbacks
-  meta: flush_handlers
 
 - name: Configure | varnish | initscript | pidfile
   replace:
@@ -18,6 +27,9 @@
     - runtime-data
     - pidfile
     - varnish
+
+- name: Trigger All Callbacks
+  meta: flush_handlers
 
 - name: Confirm Monitoring | varnish
   monit:
