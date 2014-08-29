@@ -5,11 +5,9 @@ INSTANCE=$(uname -n)
 
 DAEMON_OPTS=' -a {% if not varnish_accepts_external_connections %}localhost{% endif %}:{{ varnish_listen_port }} \
               {% if varnish_using_vcl %}-f {{ varnish_vcl_path }}{% else %}-b {{ varnish_default_backend_host }}:{{ varnish_default_backend_port }}{% endif %} \
+              -P {{ varnish_pidfile_path }} \
               -T {{ varnish_admin_address }}:{{ varnish_admin_port }} \
               -t {{ varnish_default_backend_ttl }} \
-              -w {{ varnish_thread_min }}, \
-                 {{ varnish_thread_max }}, \
-                 {{ varnish_thread_timeout }} \
               -S {{ varnish_secret_path }} \
               -s {{ varnish_storage_type }}, \
                  {% if varnish_storage_type == 'file' %}{{ varnish_storage_path }},{% endif %} \

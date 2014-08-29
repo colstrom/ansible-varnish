@@ -12,15 +12,11 @@ varnish_listen_port: 6081
 varnish_admin_address: localhost
 varnish_admin_port: 6082
 
-varnish_thread_min: 1
-varnish_thread_max: 1000
-varnish_thread_timeout: 120
-
 varnish_using_vcl: no
 
 varnish_vcl_path: /etc/varnish/default.vcl
 varnish_secret_path: /etc/varnish/secret
 
 varnish_storage_type: malloc
-varnish_storage_path: '/data/varnish/$INSTANCE/storage.bin'
+varnish_storage_path: '/tmp/varnish/$INSTANCE/storage.bin'
 varnish_storage_size: 1G
