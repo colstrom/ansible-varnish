@@ -1,4 +1,7 @@
 ---
+varnish_user: varnish
+varnish_group: varnish
+
 varnish_runtime_root: "{{ runtime_root }}/varnish"
 varnish_pidfile_path: "{{ varnish_runtime_root }}/varnishd.pid"
 
