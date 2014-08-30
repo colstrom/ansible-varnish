@@ -14,6 +14,7 @@ import directors;
         .window = {{ varnish_health_check_window }};
         .threshold = {{ varnish_health_check_threshold }};
       }
+    {% endif %}
   }
 {% endfor %}
 
