@@ -7,6 +7,14 @@ DAEMON_OPTS=" -a {% if not varnish_accepts_external_connections %}localhost{% en
               {% if varnish_using_vcl %}-f {{ varnish_vcl_path }}{% else %}-b {{ varnish_default_backend_host }}:{{ varnish_default_backend_port }}{% endif %} \
               -u {{ varnish_user }} -g {{ varnish_group }} \
               -P {{ varnish_pidfile_path }} \
+              -p thread_pools={{ varnish_thread_pools }} \
+              -p thread_pool_add_delay={{ varnish_thread_pool_add_delay }} \
+              -p thread_pool_min={{ varnish_thread_pool_min }} \
+              -p thread_pool_max={{ varnish_thread_pool_max }} \
+              -p cli_timeout={{ varnish_cli_timeout }} \
+              -p connect_timeout={{ varnish_connect_timeout }} \
+              -p timeout_linger={{ varnish_timeout_linger }} \
+              -p lru_interval={{ varnish_lru_interval }} \
               -T {{ varnish_admin_address }}:{{ varnish_admin_port }} \
               -t {{ varnish_default_backend_ttl }} \
               -S {{ varnish_secret_path }} \
