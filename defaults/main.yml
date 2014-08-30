@@ -23,3 +23,18 @@ varnish_secret_path: /etc/varnish/secret
 varnish_storage_type: malloc
 varnish_storage_path: '/tmp/varnish/$INSTANCE/storage.bin'
 varnish_storage_size: 1G
+
+varnish_backend_hosts:
+  - "{{ varnish_default_backend_host }}"
+varnish_backend_port: "{{ varnish_default_backend_port }}"
+
+varnish_health_checks_enabled: no
+
+varnish_health_check_url: /
+varnish_health_check_interval: 5s
+varnish_health_check_timeout: 3s
+varnish_health_check_window: 5
+varnish_health_check_threshold: 3
+
+varnish_grace_enabled: no
+varnish_grace_period: 2m
