@@ -126,7 +126,7 @@ sub vcl_hit {
 sub vcl_backend_response {
 {% if varnish_blacklist_enabled %}
   if (bereq.url ~ "{{ varnish_blacklist_regexp }}") {
-    set beresp.http.X-Cacheable = "NO:URL in Blacklist";
+    set beresp.http.X-Cacheable = "NO:Path in Blacklist";
     set beresp.uncacheable = true;
     set beresp.ttl = {{ varnish_backend_response_ttl }}s;
     return(deliver);
@@ -134,12 +134,7 @@ sub vcl_backend_response {
 {% endif %}
 
 {% if varnish_cache_diagnostics_enabled %}
-  if (beresp.ttl <= 0s) {
-    set beresp.http.X-Cacheable = "NO:Not Cacheable";
-    set beresp.uncacheable = true;
-    set beresp.ttl = {{ varnish_backend_response_ttl }}s;
-    return(deliver);
-  } elsif (bereq.http.Cookie) {
+  if (bereq.http.Cookie) {
     set beresp.http.X-Cacheable = "NO:Cookie in Request";
     set beresp.uncacheable = true;
     set beresp.ttl = {{ varnish_backend_response_ttl }}s;
@@ -156,6 +151,11 @@ sub vcl_backend_response {
     return(deliver);
   } elsif (beresp.http.X-No-Cache) {
     set beresp.http.X-Cacheable = "NO:X-No-Cache";
+    set beresp.uncacheable = true;
+    set beresp.ttl = {{ varnish_backend_response_ttl }}s;
+    return(deliver);
+  } elsif (beresp.ttl <= 0s) {
+    set beresp.http.X-Cacheable = "NO:Not Cacheable";
     set beresp.uncacheable = true;
     set beresp.ttl = {{ varnish_backend_response_ttl }}s;
     return(deliver);
