@@ -50,7 +50,7 @@ varnish_timeout_linger: "{% if varnish_performance_tuning_enabled %}0.150{% else
 varnish_connect_timeout: "{% if varnish_performance_tuning_enabled %}300.000{% else %}3.500{% endif %}"
 
 varnish_discards_client_cookies: yes
-varnish_discards_server_cookies: no
+varnish_discards_server_cookies: yes
 
 varnish_blacklist_enabled: no
 varnish_blacklist_regexp: '^dont_cache_me_bro$'
