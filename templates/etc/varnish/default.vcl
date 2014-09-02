@@ -65,15 +65,15 @@ sub vcl_init {
 sub vcl_recv {
 {% if varnish_blacklist_enabled %}
   if (!(req.url ~ "{{ varnish_blacklist_regexp }}")) {
+    return(pass);
+  } else {
 {% if varnish_discards_client_cookies %}
     unset req.http.Cookie;
 {% endif %}
-    return(pass);
   }
 {% endif %}
 
   set req.backend_hint = application.backend();
-}
 }
 
 ###
