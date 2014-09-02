@@ -54,3 +54,5 @@ varnish_discards_server_cookies: no
 
 varnish_blacklist_enabled: no
 varnish_blacklist_regexp: '^dont_cache_me_bro$'
+
+varnish_cache_diagnostics_enabled: yes
