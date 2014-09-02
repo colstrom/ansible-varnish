@@ -64,7 +64,7 @@ sub vcl_init {
 
 sub vcl_recv {
 {% if varnish_blacklist_enabled %}
-  if (!(req.url ~ "{{ varnish_blacklist_regexp }}")) {
+  if ((req.url ~ "{{ varnish_blacklist_regexp }}")) {
     return(pass);
   } else {
 {% if varnish_discards_client_cookies %}
@@ -124,6 +124,15 @@ sub vcl_hit {
 ###
 
 sub vcl_backend_response {
+{% if varnish_blacklist_enabled %}
+  if (bereq.url ~ "{{ varnish_blacklist_regexp }}") {
+    set beresp.http.X-Cacheable = "NO:URL in Blacklist";
+    set beresp.uncacheable = true;
+    set beresp.ttl = {{ varnish_backend_response_ttl }}s;
+    return(deliver);
+  }
+{% endif %}
+
 {% if varnish_cache_diagnostics_enabled %}
   if (beresp.ttl <= 0s) {
     set beresp.http.X-Cacheable = "NO:Not Cacheable";
@@ -152,15 +161,6 @@ sub vcl_backend_response {
     return(deliver);
   } else {
     set beresp.http.X-Cacheable = "YES";
-  }
-{% endif %}
-
-{% if varnish_blacklist_enabled %}
-  if (bereq.url ~ "{{ varnish_blacklist_regexp }}") {
-    set beresp.http.X-Cacheable = "NO:Blacklisted";
-    set beresp.uncacheable = true;
-    set beresp.ttl = {{ varnish_backend_response_ttl }}s;
-    return(deliver);
   }
 {% endif %}
 
