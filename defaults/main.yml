@@ -27,6 +27,7 @@ varnish_storage_size: 1G
 varnish_backend_hosts:
   - "{{ varnish_default_backend_host }}"
 varnish_backend_port: "{{ varnish_default_backend_port }}"
+varnish_backend_response_ttl: "{{ varnish_default_backend_ttl }}"
 
 varnish_health_checks_enabled: no
 
@@ -36,15 +37,20 @@ varnish_health_check_timeout: 3s
 varnish_health_check_window: 5
 varnish_health_check_threshold: 3
 
-varnish_grace_enabled: no
-varnish_grace_period: 2m
+varnish_grace_period: 1h
 
 varnish_performance_tuning_enabled: no
 varnish_thread_pools: "{{ ansible_processor_vcpus }}"
 varnish_thread_pool_add_delay: "{% if varnish_performance_tuning_enabled %}0.002{% else %}0.000{% endif %}"
 varnish_thread_pool_min: "{% if varnish_performance_tuning_enabled %}800{% else %}100{% endif %}"
-varnish_thread_pool_max: "{% if varnish_performance_tuning_enabled %}3000{% else %}5000{% endif %}"
+varnish_thread_pool_max: "{% if varnish_performance_tuning_enabled %}10000{% else %}5000{% endif %}"
 varnish_cli_timeout: "{% if varnish_performance_tuning_enabled %}25.000{% else %}60.000{% endif %}"
 varnish_lru_interval: "{% if varnish_performance_tuning_enabled %}20.000{% else %}2.000{% endif %}"
 varnish_timeout_linger: "{% if varnish_performance_tuning_enabled %}0.150{% else %}0.050{% endif %}"
-varnish_connect_timeout: "{% if varnish_performance_tuning_enabled %}6.000{% else %}3.500{% endif %}"
+varnish_connect_timeout: "{% if varnish_performance_tuning_enabled %}300.000{% else %}3.500{% endif %}"
+
+varnish_discards_client_cookies: yes
+varnish_discards_server_cookies: no
+
+varnish_blacklist_enabled: no
+varnish_blacklist_regexp: '^dont_cache_me_bro$'

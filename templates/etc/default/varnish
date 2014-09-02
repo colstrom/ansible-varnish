@@ -3,6 +3,11 @@ NFILES=131072
 MEMLOCK=82000
 INSTANCE=$(uname -n)
 
+###
+# Documentation
+#   https://www.varnish-cache.org/docs/trunk/reference/varnishd.html
+###
+
 DAEMON_OPTS=" -a {% if not varnish_accepts_external_connections %}localhost{% endif %}:{{ varnish_listen_port }} \
               {% if varnish_using_vcl %}-f {{ varnish_vcl_path }}{% else %}-b {{ varnish_default_backend_host }}:{{ varnish_default_backend_port }}{% endif %} \
               -u {{ varnish_user }} -g {{ varnish_group }} \
