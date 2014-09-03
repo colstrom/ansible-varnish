@@ -63,6 +63,42 @@ sub vcl_init {
 #
 
 sub vcl_recv {
+{% if varnish_workaround_telusdotcom_browser_profile %}
+  if (req.http.Cookie ~ "BrowserProfile") {
+    set req.http.X-Language = regsuball(req.http.Cookie, "language..:\\\"(.*)\\\",", "\1");
+    set req.http.X-Province = regsuball(req.http.Cookie, "region..:\\\"(.*)\\\",", "\1");
+  } else {
+    if (req.http.Cookie ~ "lang=") {
+      set req.http.X-Language = regsuball(req.http.Cookie, "lang=(.*);", "\1");
+    } else {
+      set req.http.X-Language = "en";
+    }
+
+    if (req.http.Cookie ~ "prov=") {
+      set req.http.X-Province = regsuball(req.http.Cookie, "prov=(.*);", "\1");
+    } else {
+      set req.http.X-Province = "BC";
+    }
+  }
+
+  if (req.url ~ "/(en|fr)/") {
+    if (req.url ~ "/en/" && req.http.X-Language != "en") {
+      return(pass);
+    }
+    if (req.url ~ "/fr/" && req.http.X-Language != "fr") {
+      return(pass);
+    }
+  }
+
+  if (req.url ~ "/(ab|bc|mb|nb|nl|ns|nt|nu|on|pe|qc|sk|yt)/") {
+    {% for province in ['ab', 'bc', 'mb', 'nb', 'nl', 'ns', 'nt', 'nu', 'on', 'pe', 'qc', 'sk', 'yt'] %}
+    if (req.url ~ "{{ province }}" && req.http.X-Province != "{{ province }}") {
+      return(pass);
+    }
+    {% endfor %}
+  }
+{% endif %}
+
 {% if varnish_blacklist_enabled %}
   if ((req.url ~ "{{ varnish_blacklist_regexp }}")) {
     return(pass);
@@ -130,7 +166,15 @@ sub vcl_backend_response {
     set beresp.uncacheable = true;
     set beresp.ttl = {{ varnish_backend_response_ttl }}s;
     return(deliver);
+  } else {
+{% if varnish_discards_server_cookies %}
+    unset beresp.http.Set-Cookie;
+{% endif %}
   }
+{% else %}
+{% if varnish_discards_server_cookies %}
+  unset beresp.http.Set-Cookie;
+{% endif %}
 {% endif %}
 
 {% if varnish_cache_diagnostics_enabled %}
@@ -162,10 +206,6 @@ sub vcl_backend_response {
   } else {
     set beresp.http.X-Cacheable = "YES";
   }
-{% endif %}
-
-{% if varnish_discards_server_cookies %}
-  unset beresp.http.Set-Cookie;
 {% endif %}
 
   set beresp.grace = {{ varnish_grace_period }};
