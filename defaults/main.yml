@@ -29,7 +29,7 @@ varnish_backend_hosts:
 varnish_backend_port: "{{ varnish_default_backend_port }}"
 varnish_backend_response_ttl: "{{ varnish_default_backend_ttl }}"
 
-varnish_health_checks_enabled: no
+varnish_health_checks_enabled: yes
 
 varnish_health_check_url: /
 varnish_health_check_interval: 12s
@@ -56,4 +56,9 @@ varnish_blacklist_enabled: no
 varnish_blacklist_regexp: '^dont_cache_me_bro$'
 
 varnish_cache_diagnostics_enabled: yes
+
+varnish_header_sanitization_enabled: yes
+varnish_cookie_sanitization_enabled: yes
+varnish_uri_sanitization_enabled: yes
+
 varnish_workaround_telusdotcom_browser_profile: no
