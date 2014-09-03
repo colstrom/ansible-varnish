@@ -63,7 +63,97 @@ sub vcl_init {
 #
 
 sub vcl_recv {
+  set req.backend_hint = application.backend();
+
+  ###
+  # Avoid processing uncacheable requests
+  ###
+
+  if (req.http.Authorization) {
+    return (pass);
+  }
+
+  ###
+  # Inject X-Forwarded-For headers, but only once.
+  ###
+
+  if (req.restarts == 0) {
+    if (req.http.X-Forwarded-For) {
+      set req.http.X-Forwarded-For = req.http.X-Forwarded-For + ", " + client.ip;
+    } else {
+      set req.http.X-Forwarded-For = client.ip;
+    }
+  }
+
+{% if varnish_header_sanitization_enabled %}
+  ###
+  # Header Sanitization
+  ###
+
+  set req.http.Host = regsub(req.http.Host, ":[0-9]+", "");
+
+  if (req.http.Accept-Encoding) {
+    if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
+      unset req.http.Accept-Encoding;
+    } elsif (req.http.Accept-Encoding ~ "gzip") {
+      set req.http.Accept-Encoding = "gzip";
+    } elsif (req.http.Accept-Encoding ~ "deflate") {
+      set req.http.Accept-Encoding = "deflate";
+    } else {
+      unset req.http.Accept-Encoding;
+    }
+  }
+{% endif %}
+
+{% if varnish_cookie_sanitization_enabled %}
+  ###
+  # Cookie Sanitization
+  ###
+
+  ### Google Analytics
+  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
+  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
+  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
+  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
+  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
+
+  ### Quantcast
+  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
+  
+  ### AddThis
+  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
+
+  ### General Cleanup
+  set req.http.Cookie = regsuball(req.http.Cookie, "^;\s*", "");
+  if (req.http.cookie ~ "^\s*$") {
+      unset req.http.cookie;
+  }
+{% endif %}
+
+{% if varnish_uri_sanitization_enabled %}
+  ###
+  # URI Sanitization
+  ###
+  
+  if (req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
+    set req.url = regsuball(req.url, "&(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "");
+    set req.url = regsuball(req.url, "\?(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "?");
+    set req.url = regsub(req.url, "\?&", "?");
+    set req.url = regsub(req.url, "\?$", "");
+  }
+  if (req.url ~ "\#") {
+    set req.url = regsub(req.url, "\#.*$", "");
+  }
+  if (req.url ~ "\?$") {
+    set req.url = regsub(req.url, "\?$", "");
+  }
+{% endif %}
+
 {% if varnish_workaround_telusdotcom_browser_profile %}
+  ###
+  # Workaround for BrowserProfile and Language/Region Detection on TELUS.com
+  ###
+
   if (req.http.Cookie ~ "BrowserProfile") {
     set req.http.X-Language = regsuball(req.http.Cookie, "language..:\\.(.*)\\.,", "\1");
     set req.http.X-Province = regsuball(req.http.Cookie, "region..:\\.(.*)\\.,", "\1");
@@ -109,7 +199,6 @@ sub vcl_recv {
   }
 {% endif %}
 
-  set req.backend_hint = application.backend();
 }
 
 ###
