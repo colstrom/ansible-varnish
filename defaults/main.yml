@@ -32,9 +32,9 @@ varnish_backend_response_ttl: "{{ varnish_default_backend_ttl }}"
 varnish_health_checks_enabled: no
 
 varnish_health_check_url: /
-varnish_health_check_interval: 5s
-varnish_health_check_timeout: 3s
-varnish_health_check_window: 5
+varnish_health_check_interval: 12s
+varnish_health_check_timeout: 5s
+varnish_health_check_window: 8
 varnish_health_check_threshold: 3
 
 varnish_grace_period: 1h
