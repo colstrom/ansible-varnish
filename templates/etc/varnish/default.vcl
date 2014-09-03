@@ -65,8 +65,8 @@ sub vcl_init {
 sub vcl_recv {
 {% if varnish_workaround_telusdotcom_browser_profile %}
   if (req.http.Cookie ~ "BrowserProfile") {
-    set req.http.X-Language = regsuball(req.http.Cookie, "language..:\\\"(.*)\\\",", "\1");
-    set req.http.X-Province = regsuball(req.http.Cookie, "region..:\\\"(.*)\\\",", "\1");
+    set req.http.X-Language = regsuball(req.http.Cookie, "language..:\\.(.*)\\.,", "\1");
+    set req.http.X-Province = regsuball(req.http.Cookie, "region..:\\.(.*)\\.,", "\1");
   } else {
     if (req.http.Cookie ~ "lang=") {
       set req.http.X-Language = regsuball(req.http.Cookie, "lang=(.*);", "\1");
