@@ -90,7 +90,9 @@ sub vcl_recv {
   # Header Sanitization
   ###
 
+{% if varnish_discards_port_from_host_header %}
   set req.http.Host = regsub(req.http.Host, ":[0-9]+", "");
+{% endif %}
 
   if (req.http.Accept-Encoding) {
     if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
@@ -144,9 +146,7 @@ sub vcl_recv {
   if (req.url ~ "\#") {
     set req.url = regsub(req.url, "\#.*$", "");
   }
-  if (req.url ~ "\?$") {
-    set req.url = regsub(req.url, "\?$", "");
-  }
+
 {% endif %}
 
 {% if varnish_workaround_telusdotcom_browser_profile %}

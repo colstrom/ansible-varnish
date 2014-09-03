@@ -62,3 +62,4 @@ varnish_cookie_sanitization_enabled: yes
 varnish_uri_sanitization_enabled: yes
 
 varnish_workaround_telusdotcom_browser_profile: no
+varnish_discards_port_from_host_header: no
