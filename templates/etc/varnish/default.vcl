@@ -155,8 +155,8 @@ sub vcl_recv {
   ###
 
   if (req.http.Cookie ~ "BrowserProfile") {
-    set req.http.X-Language = regsuball(req.http.Cookie, "language..:\\.(.*)\\.,", "\1");
-    set req.http.X-Province = regsuball(req.http.Cookie, "region..:\\.(.*)\\.,", "\1");
+    set req.http.X-Language = regsuball(req.http.Cookie, "(language..:\\.)(.*)\\.,", "\2");
+    set req.http.X-Province = regsuball(req.http.Cookie, "(region..:\\.)(.*)\\.,", "\2");
   } else {
     if (req.http.Cookie ~ "lang=") {
       set req.http.X-Language = regsuball(req.http.Cookie, "lang=(.*);", "\1");
