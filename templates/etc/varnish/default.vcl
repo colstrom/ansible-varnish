@@ -259,6 +259,15 @@ sub vcl_hit {
 ###
 
 sub vcl_backend_response {
+{% if varnish_workaround_telusdotcom_browser_profile %}
+  if (bereq.http.X-Language) {
+    set bereq.http.X-Language;
+  }
+  if (bereq.http.X-Province) {
+    set bereq.http.X-Province;
+  }
+{% endif %}
+
 {% if varnish_blacklist_enabled %}
   if (bereq.url ~ "{{ varnish_blacklist_regexp }}") {
     set beresp.http.X-Cacheable = "NO:Path in Blacklist";
