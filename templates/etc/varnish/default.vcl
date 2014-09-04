@@ -173,28 +173,34 @@ sub vcl_recv {
 
   if (req.url ~ "/(en|fr)/") {
     if (req.url ~ "/en/" && req.http.X-Language != "en") {
+      set req.http.X-Passthrough-Reason = "Unaligned Path and Cookie (Language)";
       return(pass);
     }
     if (req.url ~ "/fr/" && req.http.X-Language != "fr") {
+      set req.http.X-Passthrough-Reason = "Unaligned Path and Cookie (Language)";
       return(pass);
     }
   } else {
+      set req.http.X-Passthrough-Reason = "Not Set in Path (Language)";
     return(pass);
   }
 
   if (req.url ~ "/(ab|bc|mb|nb|nl|ns|nt|nu|on|pe|qc|sk|yt)/") {
     {% for province in ['ab', 'bc', 'mb', 'nb', 'nl', 'ns', 'nt', 'nu', 'on', 'pe', 'qc', 'sk', 'yt'] %}
     if (req.url ~ "{{ province }}" && req.http.X-Province != "{{ province }}") {
+      set req.http.X-Passthrough-Reason = "Unaligned Path and Cookie (Province)";
       return(pass);
     }
     {% endfor %}
   } else {
+      set req.http.X-Passthrough-Reason = "Not Set in Path (Province)";
     return(pass);
   }
 {% endif %}
 
 {% if varnish_blacklist_enabled %}
   if ((req.url ~ "{{ varnish_blacklist_regexp }}")) {
+    set req.http.X-Passthrough-Reason = "Path in Blacklist";
     return(pass);
   } else {
 {% if varnish_discards_client_cookies %}
@@ -260,9 +266,14 @@ sub vcl_backend_response {
     set beresp.ttl = {{ varnish_backend_response_ttl }}s;
     return(deliver);
   } else {
+    if (bereq.http.X-Passthrough-Reason) {
+      set beresp.http.X-Passthrough-Reason = bereq.http.X-Passthrough-Reason;
+      return(deliver);
+    } else {
 {% if varnish_discards_server_cookies %}
-    unset beresp.http.Set-Cookie;
+      unset beresp.http.Set-Cookie;
 {% endif %}
+    }
   }
 {% else %}
 {% if varnish_discards_server_cookies %}
