@@ -178,6 +178,8 @@ sub vcl_recv {
     if (req.url ~ "/fr/" && req.http.X-Language != "fr") {
       return(pass);
     }
+  } else {
+    return(pass);
   }
 
   if (req.url ~ "/(ab|bc|mb|nb|nl|ns|nt|nu|on|pe|qc|sk|yt)/") {
@@ -186,6 +188,8 @@ sub vcl_recv {
       return(pass);
     }
     {% endfor %}
+  } else {
+    return(pass);
   }
 {% endif %}
 
