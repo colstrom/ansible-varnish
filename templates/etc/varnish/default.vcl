@@ -155,17 +155,17 @@ sub vcl_recv {
   ###
 
   if (req.http.Cookie ~ "BrowserProfile") {
-    set req.http.X-Language = regsuball(req.http.Cookie, "language..:\\.([^\\]*)", "\1");
-    set req.http.X-Province = regsuball(req.http.Cookie, "region..:\\.([^\\]*)", "\1");
+    set req.http.X-Language = std.tolower(regsuball(req.http.Cookie, "(.*)language..:\\.([^\\]*)(.*)", "\2"));
+    set req.http.X-Province = std.tolower(regsuball(req.http.Cookie, "(.*)region..:\\.([^\\]*)(.*)", "\2"));
   } else {
     if (req.http.Cookie ~ "lang=") {
-      set req.http.X-Language = regsuball(req.http.Cookie, "lang=([^;]*)", "\1");
+      set req.http.X-Language = std.tolower(regsuball(req.http.Cookie, "(.*)lang=([^;]*)(.*)", "\2"));
     } else {
       set req.http.X-Language = "en";
     }
 
     if (req.http.Cookie ~ "prov=") {
-      set req.http.X-Province = regsuball(req.http.Cookie, "prov=([^;]*)", "\1");
+      set req.http.X-Province = std.tolower(regsuball(req.http.Cookie, "(.*)prov=([^;]*)(.*)", "\2"));
     } else {
       set req.http.X-Province = "BC";
     }
