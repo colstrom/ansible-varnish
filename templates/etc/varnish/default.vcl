@@ -317,6 +317,10 @@ sub vcl_backend_response {
       set beresp.http.X-Passthrough-Reason = bereq.http.X-Passthrough-Reason;
 {% endif %}
       return(deliver);
+    } else {
+{% if varnish_cookie_sanitization_discard_from_server %}
+      unset beresp.http.Set-Cookie;
+{% endif %}
     }
   }
 {% else %}
