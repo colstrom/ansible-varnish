@@ -70,6 +70,7 @@ sub vcl_recv {
   ###
 
   if (req.http.Authorization) {
+    set req.http.X-Passthrough-Reason = "No Caching Authenticated Content";
     return (pass);
   }
 
@@ -80,6 +81,7 @@ sub vcl_recv {
   }
 {% endif %}
 
+{% if varnish_diagnostic_headers_forwarded_for %}
   ###
   # Inject X-Forwarded-For headers, but only once.
   ###
@@ -91,6 +93,7 @@ sub vcl_recv {
       set req.http.X-Forwarded-For = client.ip;
     }
   }
+{% endif %}
 
 {% if varnish_header_sanitization_enabled %}
   ###
@@ -101,6 +104,7 @@ sub vcl_recv {
   set req.http.Host = regsub(req.http.Host, ":[0-9]+", "");
 {% endif %}
 
+{% if varnish_header_sanitization_normalize_accept_encoding %}
   if (req.http.Accept-Encoding) {
     if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
       unset req.http.Accept-Encoding;
@@ -114,10 +118,13 @@ sub vcl_recv {
   }
 {% endif %}
 
+{% endif %}
+
 {% if varnish_cookie_sanitization_enabled %}
   ###
   # Cookie Sanitization
   ###
+
 {% for cookie in varnish_cookie_sanitization_blacklist %}
   set req.http.Cookie = regsuball(req.http.Cookie, "{{ cookie }}=[^;]+(; )?", "");
 {% endfor %}
@@ -147,7 +154,7 @@ sub vcl_recv {
 
 {% if varnish_workaround_telusdotcom_browser_profile %}
   ###
-  # Workaround for BrowserProfile and Language/Region Detection on TELUS.com
+  # Workaround and Diagnostics for BrowserProfile and Language/Region Detection on TELUS.com
   ###
 
   if (req.http.Cookie ~ "BrowserProfile") {
@@ -304,7 +311,9 @@ sub vcl_backend_response {
     return(deliver);
   } else {
     if (bereq.http.X-Passthrough-Reason) {
+{% if varnish_diagnostic_headers_passthrough_reason %}
       set beresp.http.X-Passthrough-Reason = bereq.http.X-Passthrough-Reason;
+{% endif %}
       return(deliver);
     }
   }
