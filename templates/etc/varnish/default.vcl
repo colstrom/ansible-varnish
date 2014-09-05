@@ -214,6 +214,7 @@ sub vcl_recv {
     }
   }
 
+
   if (req.url ~ "/(en|fr)/") {
     if (req.url ~ "/en/" && req.http.X-Language != "en") {
       set req.http.X-Passthrough-Reason = "Unaligned Language (Path: /en/) vs (Cookie: " + req.http.X-Language + ")";
@@ -238,6 +239,16 @@ sub vcl_recv {
   } else {
       set req.http.X-Passthrough-Reason = "Not Set in Path (Province)";
     return(pass);
+  }
+
+  if (req.http.Cookie) {
+    if (req.http.Cookie ~ "***REMOVED***") {
+      set req.http.X-Resolution = regsuball(req.http.Cookie, "(.*)***REMOVED***=([^;]*)(.*)", "\2");
+    }
+
+    if (req.http.Cookie ~ "***REMOVED***") {
+      set req.http.X-***REMOVED*** = regsuball(req.http.Cookie, "(.*)***REMOVED***=([^;]*)(.*)", "\2");
+    }
   }
 {% endif %}
 
