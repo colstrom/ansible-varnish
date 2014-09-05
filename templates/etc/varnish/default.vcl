@@ -124,6 +124,7 @@ sub vcl_recv {
   ###
   # Cookie Sanitization
   ###
+  set req.http.X-Cookie-Unmodified = req.http.Cookie;
 
 {% for cookie in varnish_cookie_sanitization_blacklist %}
   set req.http.Cookie = regsuball(req.http.Cookie, "{{ cookie }}=[^;]+(; )?", "");
@@ -134,6 +135,7 @@ sub vcl_recv {
   if (req.http.cookie ~ "^\s*$") {
       unset req.http.cookie;
   }
+  set req.http.X-Cookie-Sanitized = req.http.Cookie;
 {% endif %}
 
 {% if varnish_uri_sanitization_enabled %}
