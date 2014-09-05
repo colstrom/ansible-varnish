@@ -174,7 +174,7 @@ sub vcl_recv {
     if (req.http.Cookie ~ "prov=") {
       set req.http.X-Province = std.tolower(regsuball(req.http.Cookie, "(.*)prov=([^;]*)(.*)", "\2"));
     } else {
-      set req.http.X-Province = "BC";
+      set req.http.X-Province = "bc";
     }
   }
 
