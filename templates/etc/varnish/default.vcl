@@ -284,15 +284,15 @@ sub vcl_backend_response {
 {% if varnish_workaround_telusdotcom_browser_profile %}
   if (bereq.http.X-Language) {
     set beresp.http.X-Language = bereq.http.X-Language;
-    if (bereq.http.X-Language-Found) {
-      set beresp.http.X-Language-Found = bereq.http.X-Language-Found;
-    }
+#    if (bereq.http.X-Language-Found) {
+#      set beresp.http.X-Language-Found = bereq.http.X-Language-Found;
+#    }
   }
   if (bereq.http.X-Region) {
     set beresp.http.X-Region = bereq.http.X-Region;
-    if (bereq.http.X-Region-Found) {
-      set beresp.http.X-Region-Found = bereq.http.X-Region-Found;
-    }
+#    if (bereq.http.X-Region-Found) {
+#      set beresp.http.X-Region-Found = bereq.http.X-Region-Found;
+#    }
   }
 {% endif %}
 
