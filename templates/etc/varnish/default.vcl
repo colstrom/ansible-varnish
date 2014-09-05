@@ -132,10 +132,12 @@ sub vcl_recv {
 
   ### General Cleanup
   set req.http.Cookie = regsuball(req.http.Cookie, "^;\s*", "");
-  if (req.http.cookie ~ "^\s*$") {
-      unset req.http.cookie;
+  if (req.http.Cookie ~ "^\s*$") {
+      unset req.http.Cookie;
   }
-  set req.http.X-Cookie-Sanitized = req.http.Cookie;
+  if (req.http.Cookie) {
+    set req.http.X-Cookie-Sanitized = req.http.Cookie;
+  }
 {% endif %}
 
 {% if varnish_uri_sanitization_enabled %}
