@@ -48,12 +48,6 @@ varnish_lru_interval: "{% if varnish_performance_tuning_enabled %}20.000{% else 
 varnish_timeout_linger: "{% if varnish_performance_tuning_enabled %}0.150{% else %}0.050{% endif %}"
 varnish_connect_timeout: "{% if varnish_performance_tuning_enabled %}300.000{% else %}3.500{% endif %}"
 
-varnish_discards_client_cookies: yes
-varnish_discards_server_cookies: yes
-
-varnish_uri_blacklist_enabled: no
-varnish_uri_blacklist_regexp: '^dont_cache_me_bro$'
-
 varnish_diagnostic_headers_enabled: yes
 varnish_diagnostic_headers_forwarded_for: "{{ varnish_diagnostic_headers_enabled }}"
 varnish_diagnostic_headers_cache: "{{ varnish_diagnostic_headers_enabled }}"
@@ -63,7 +57,7 @@ varnish_diagnostic_headers_passthrough_reason: "{{ varnish_diagnostic_headers_en
 varnish_request_sanitization_enabled: yes
 
 varnish_header_sanitization_enabled: "{{ varnish_request_sanitization_enabled }}"
-varnish_header_sanitization_discard_host_port: "{{ varnish_header_sanitization_enabled }}"
+varnish_header_sanitization_discard_host_port: no
 varnish_header_sanitization_normalize_accept_encoding: "{{ varnish_header_sanitization_enabled }}"
 
 varnish_cookie_sanitization_enabled: "{{ varnish_request_sanitization_enabled }}"
@@ -95,5 +89,7 @@ varnish_cookie_sanitization_blacklist:
 varnish_uri_sanitization_enabled: "{{ varnish_request_sanitization_enabled }}"
 varnish_uri_sanitization_regexp: '(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)'
 
+varnish_uri_blacklist_enabled: no
+varnish_uri_blacklist_regexp: '^dont_cache_me_bro$'
+
 varnish_workaround_telusdotcom_browser_profile: no
-varnish_discards_port_from_host_header: no
