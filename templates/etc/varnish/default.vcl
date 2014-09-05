@@ -124,19 +124,21 @@ sub vcl_recv {
   ###
   # Cookie Sanitization
   ###
-  set req.http.X-Cookie-Unmodified = req.http.Cookie;
-
-{% for cookie in varnish_cookie_sanitization_blacklist %}
-  set req.http.Cookie = regsuball(req.http.Cookie, "{{ cookie }}=[^;]+(; )?", "");
-{% endfor %}
-
-  ### General Cleanup
-  set req.http.Cookie = regsuball(req.http.Cookie, "^;\s*", "");
-  if (req.http.Cookie ~ "^\s*$") {
-      unset req.http.Cookie;
-  }
   if (req.http.Cookie) {
-    set req.http.X-Cookie-Sanitized = req.http.Cookie;
+    set req.http.X-Cookie-Unmodified = req.http.Cookie;
+
+  {% for cookie in varnish_cookie_sanitization_blacklist %}
+    set req.http.Cookie = regsuball(req.http.Cookie, "{{ cookie }}=[^;]+(; )?", "");
+  {% endfor %}
+
+    ### General Cleanup
+    set req.http.Cookie = regsuball(req.http.Cookie, "^;\s*", "");
+    if (req.http.Cookie ~ "^\s*$") {
+        unset req.http.Cookie;
+    }
+    if (req.http.Cookie) {
+      set req.http.X-Cookie-Sanitized = req.http.Cookie;
+    }
   }
 {% endif %}
 
