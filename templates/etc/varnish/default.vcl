@@ -73,8 +73,8 @@ sub vcl_recv {
     return (pass);
   }
 
-{% if varnish_blacklist_enabled %}
-  if ((req.url ~ "{{ varnish_blacklist_regexp }}")) {
+{% if varnish_uri_blacklist_enabled %}
+  if ((req.url ~ "{{ varnish_uri_blacklist_regexp }}")) {
     set req.http.X-Passthrough-Reason = "Path in Blacklist";
     return(pass);
   }
@@ -97,7 +97,7 @@ sub vcl_recv {
   # Header Sanitization
   ###
 
-{% if varnish_discards_port_from_host_header %}
+{% if varnish_header_sanitization_discard_host_port %}
   set req.http.Host = regsub(req.http.Host, ":[0-9]+", "");
 {% endif %}
 
@@ -118,19 +118,9 @@ sub vcl_recv {
   ###
   # Cookie Sanitization
   ###
-
-  ### Google Analytics
-  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
-  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
-  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
-  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
-  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
-
-  ### Quantcast
-  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
-  
-  ### AddThis
-  set req.http.Cookie = regsuball(req.http.Cookie, "***REMOVED***=[^;]+(; )?", "");
+{% for cookie in varnish_cookie_sanitization_blacklist %}
+  set req.http.Cookie = regsuball(req.http.Cookie, "{{ cookie }}=[^;]+(; )?", "");
+{% endfor %}
 
   ### General Cleanup
   set req.http.Cookie = regsuball(req.http.Cookie, "^;\s*", "");
@@ -144,16 +134,15 @@ sub vcl_recv {
   # URI Sanitization
   ###
   
-  if (req.url ~ "(\?|&)(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=") {
-    set req.url = regsuball(req.url, "&(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "");
-    set req.url = regsuball(req.url, "\?(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)=([A-z0-9_\-\.%25]+)", "?");
+  if (req.url ~ "(\?|&){{ varnish_uri_sanitization_regexp }}=") {
+    set req.url = regsuball(req.url, "&{{ varnish_uri_sanitization_regexp }}=([A-z0-9_\-\.%25]+)", "");
+    set req.url = regsuball(req.url, "\?{{ varnish_uri_sanitization_regexp }}=([A-z0-9_\-\.%25]+)", "?");
     set req.url = regsub(req.url, "\?&", "?");
     set req.url = regsub(req.url, "\?$", "");
   }
   if (req.url ~ "\#") {
     set req.url = regsub(req.url, "\#.*$", "");
   }
-
 {% endif %}
 
 {% if varnish_workaround_telusdotcom_browser_profile %}
@@ -162,29 +151,63 @@ sub vcl_recv {
   ###
 
   if (req.http.Cookie ~ "BrowserProfile") {
-    set req.http.X-Language = std.tolower(regsuball(req.http.Cookie, "(.*)language..:\\.([^\\]*)(.*)", "\2"));
-    set req.http.X-Province = std.tolower(regsuball(regsuball(req.http.Cookie, "geo\\.\:{(.*)\}", ""), "(.*)region..:\\.([^\\]*)(.*)", "\2"));
-  } else {
+    set req.http.X-BrowserProfile = regsuball(req.http.Cookie, "(.*)BrowserProfile=([^;]*)(.*)", "\2");
+    if (req.http.X-BrowserProfile ~ "language") {
+      set req.http.X-Language = std.tolower(regsuball(req.http.X-BrowserProfile, "(.*)language\\.:\\.([^\\]*)(.*)", "\2"));
+      set req.http.X-Language-Found = "YES:BrowserProfile";
+    }
+    if (req.http.X-BrowserProfile ~ "region") {
+      set req.http.X-Region = std.tolower(regsuball(regsuball(req.http.X-BrowserProfile, "geo\\.\:{(.*)\}", ""), "(.*)region\\.:\\.([^\\]*)(.*)", "\2"));
+      set req.http.X-Region-Found = "YES:BrowserProfile";
+    }
+    if (req.http.X-BrowserProfile ~ "geo") {
+      set req.http.X-BrowserProfile-Geolocation = regsuball(req.http.X-BrowserProfile, "(.*)geo..:\\.([^\\]*)(.*)", "\2");
+      set req.http.X-BrowserProfile-Geolocation-Found: "YES";
+
+      if (req.http.X-BrowserProfile-Geolocation ~ "country") {
+        set req.http.X-BrowserProfile-Geolocation-Country = regsuball(req.http.X-BrowserProfile-Geolocation, "(.*)country\\.:\\.([^\\]*)(.*)", "\2");
+      }
+      if (req.http.X-BrowserProfile-Geolocation ~ "region") {
+        set req.http.X-BrowserProfile-Geolocation-Region = regsuball(req.http.X-BrowserProfile-Geolocation, "(.*)region\\.:\\.([^\\]*)(.*)", "\2");
+      }
+      if (req.http.X-BrowserProfile-Geolocation ~ "city") {
+        set req.http.X-BrowserProfile-Geolocation-City = regsuball(req.http.X-BrowserProfile-Geolocation, "(.*)city\\.:\\.([^\\]*)(.*)", "\2");
+      }
+      if (req.http.X-BrowserProfile-Geolocation ~ "isp") {
+        set req.http.X-BrowserProfile-Geolocation-ISP = regsuball(req.http.X-BrowserProfile-Geolocation, "(.*)isp\\.:\\.([^\\]*)(.*)", "\2");
+      }
+    } else {
+      set req.http.X-BrowserProfile-Geolocation-Found: "NO";
+    }
+  }
+
+  if (!req.http.X-Language) {
     if (req.http.Cookie ~ "lang=") {
       set req.http.X-Language = std.tolower(regsuball(req.http.Cookie, "(.*)lang=([^;]*)(.*)", "\2"));
+      set req.http.X-Language-Found = "YES:lang";
     } else {
       set req.http.X-Language = "en";
+      set req.http.X-Language-Found = "NO";
     }
+  }
 
+  if (!req.http.X-Region) {
     if (req.http.Cookie ~ "prov=") {
-      set req.http.X-Province = std.tolower(regsuball(req.http.Cookie, "(.*)prov=([^;]*)(.*)", "\2"));
+      set req.http.X-Region = std.tolower(regsuball(req.http.Cookie, "(.*)prov=([^;]*)(.*)", "\2"));
+      set req.http.X-Region-Found = "YES:prov";
     } else {
-      set req.http.X-Province = "bc";
+      set req.http.X-Region = "bc";
+      set req.http.X-Region-Found = "NO";
     }
   }
 
   if (req.url ~ "/(en|fr)/") {
     if (req.url ~ "/en/" && req.http.X-Language != "en") {
-      set req.http.X-Passthrough-Reason = "Unaligned Path and Cookie (Language)";
+      set req.http.X-Passthrough-Reason = "Unaligned Language (Path: /en/) vs (Cookie: " + req.http.X-Language + ")";
       return(pass);
     }
     if (req.url ~ "/fr/" && req.http.X-Language != "fr") {
-      set req.http.X-Passthrough-Reason = "Unaligned Path and Cookie (Language)";
+      set req.http.X-Passthrough-Reason = "Unaligned Language (Path: /fr/) vs (Cookie: " + req.http.X-Language + ")";
       return(pass);
     }
   } else {
@@ -194,8 +217,8 @@ sub vcl_recv {
 
   if (req.url ~ "/(ab|bc|mb|nb|nl|ns|nt|nu|on|pe|qc|sk|yt)/") {
     {% for province in ['ab', 'bc', 'mb', 'nb', 'nl', 'ns', 'nt', 'nu', 'on', 'pe', 'qc', 'sk', 'yt'] %}
-    if (req.url ~ "/{{ province }}/" && req.http.X-Province != "{{ province }}") {
-      set req.http.X-Passthrough-Reason = "Unaligned Path and Cookie (Province)";
+    if (req.url ~ "/{{ province }}/" && req.http.X-Region != "{{ province }}") {
+      set req.http.X-Passthrough-Reason = "Unaligned Region (Path: /{{ province }}/) vs (Cookie: " + req.http.X-Region + ")";
       return(pass);
     }
     {% endfor %}
@@ -205,7 +228,7 @@ sub vcl_recv {
   }
 {% endif %}
 
-{% if varnish_discards_client_cookies %}
+{% if varnish_cookie_sanitization_discard_from_client %}
     unset req.http.Cookie;
 {% endif %}
 }
@@ -261,14 +284,20 @@ sub vcl_backend_response {
 {% if varnish_workaround_telusdotcom_browser_profile %}
   if (bereq.http.X-Language) {
     set beresp.http.X-Language = bereq.http.X-Language;
+    if (bereq.http.X-Language-Found) {
+      set beresp.http.X-Language-Found = bereq.http.X-Language-Found;
+    }
   }
-  if (bereq.http.X-Province) {
-    set beresp.http.X-Province = bereq.http.X-Province;
+  if (bereq.http.X-Region) {
+    set beresp.http.X-Region = bereq.http.X-Region;
+    if (bereq.http.X-Region-Found) {
+      set beresp.http.X-Region-Found = bereq.http.X-Region-Found;
+    }
   }
 {% endif %}
 
-{% if varnish_blacklist_enabled %}
-  if (bereq.url ~ "{{ varnish_blacklist_regexp }}") {
+{% if varnish_uri_blacklist_enabled %}
+  if (bereq.url ~ "{{ varnish_uri_blacklist_regexp }}") {
     set beresp.http.X-Cacheable = "NO:Path in Blacklist";
     set beresp.uncacheable = true;
     set beresp.ttl = {{ varnish_backend_response_ttl }}s;
@@ -277,14 +306,10 @@ sub vcl_backend_response {
     if (bereq.http.X-Passthrough-Reason) {
       set beresp.http.X-Passthrough-Reason = bereq.http.X-Passthrough-Reason;
       return(deliver);
-    } else {
-{% if varnish_discards_server_cookies %}
-      unset beresp.http.Set-Cookie;
-{% endif %}
     }
   }
 {% else %}
-{% if varnish_discards_server_cookies %}
+{% if varnish_cookie_sanitization_discard_from_server %}
   unset beresp.http.Set-Cookie;
 {% endif %}
 {% endif %}
