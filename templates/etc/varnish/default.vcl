@@ -314,7 +314,7 @@ sub vcl_backend_response {
 {% endif %}
 {% endif %}
 
-{% if varnish_cache_diagnostics_enabled %}
+{% if varnish_diagnostic_headers_enabled %}
   if (bereq.http.Cookie) {
     set beresp.http.X-Cacheable = "NO:Cookie in Request";
     set beresp.uncacheable = true;
