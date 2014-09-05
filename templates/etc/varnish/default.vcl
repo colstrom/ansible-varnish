@@ -162,7 +162,7 @@ sub vcl_recv {
     }
     if (req.http.X-BrowserProfile ~ "geo") {
       set req.http.X-BrowserProfile-Geolocation = regsuball(req.http.X-BrowserProfile, "(.*)geo..:\\.([^\\]*)(.*)", "\2");
-      set req.http.X-BrowserProfile-Geolocation-Found: "YES";
+      set req.http.X-BrowserProfile-Geolocation-Found = "YES";
 
       if (req.http.X-BrowserProfile-Geolocation ~ "country") {
         set req.http.X-BrowserProfile-Geolocation-Country = regsuball(req.http.X-BrowserProfile-Geolocation, "(.*)country\\.:\\.([^\\]*)(.*)", "\2");
@@ -177,7 +177,7 @@ sub vcl_recv {
         set req.http.X-BrowserProfile-Geolocation-ISP = regsuball(req.http.X-BrowserProfile-Geolocation, "(.*)isp\\.:\\.([^\\]*)(.*)", "\2");
       }
     } else {
-      set req.http.X-BrowserProfile-Geolocation-Found: "NO";
+      set req.http.X-BrowserProfile-Geolocation-Found = "NO";
     }
   }
 
