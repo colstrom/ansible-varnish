@@ -73,6 +73,13 @@ sub vcl_recv {
     return (pass);
   }
 
+{% if varnish_blacklist_enabled %}
+  if ((req.url ~ "{{ varnish_blacklist_regexp }}")) {
+    set req.http.X-Passthrough-Reason = "Path in Blacklist";
+    return(pass);
+  }
+{% endif %}
+
   ###
   # Inject X-Forwarded-For headers, but only once.
   ###
@@ -198,17 +205,9 @@ sub vcl_recv {
   }
 {% endif %}
 
-{% if varnish_blacklist_enabled %}
-  if ((req.url ~ "{{ varnish_blacklist_regexp }}")) {
-    set req.http.X-Passthrough-Reason = "Path in Blacklist";
-    return(pass);
-  } else {
 {% if varnish_discards_client_cookies %}
     unset req.http.Cookie;
 {% endif %}
-  }
-{% endif %}
-
 }
 
 ###
