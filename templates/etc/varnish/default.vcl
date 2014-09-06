@@ -120,28 +120,6 @@ sub vcl_recv {
 
 {% endif %}
 
-{% if varnish_cookie_sanitization_enabled %}
-  ###
-  # Cookie Sanitization
-  ###
-  if (req.http.Cookie) {
-    set req.http.X-Cookie-Unmodified = req.http.Cookie;
-
-  {% for cookie in varnish_cookie_sanitization_blacklist %}
-    set req.http.Cookie = regsuball(req.http.Cookie, "{{ cookie }}=[^;]+(; )?", "");
-  {% endfor %}
-
-    ### General Cleanup
-    set req.http.Cookie = regsuball(req.http.Cookie, "^;\s*", "");
-    if (req.http.Cookie ~ "^\s*$") {
-        unset req.http.Cookie;
-    }
-    if (req.http.Cookie) {
-      set req.http.X-Cookie-Sanitized = req.http.Cookie;
-    }
-  }
-{% endif %}
-
 {% if varnish_uri_sanitization_enabled %}
   ###
   # URI Sanitization
@@ -243,11 +221,36 @@ sub vcl_recv {
 
   if (req.http.Cookie) {
     if (req.http.Cookie ~ "***REMOVED***") {
-      set req.http.X-Resolution = regsuball(req.http.Cookie, "(.*)***REMOVED***=([^;]*)(.*)", "\2");
+      set req.http.X-Screen-Resolution = regsuball(req.http.Cookie, "(.*)***REMOVED***=([^;]*)(.*)", "\2");
     }
 
     if (req.http.Cookie ~ "***REMOVED***") {
-      set req.http.X-***REMOVED*** = regsuball(req.http.Cookie, "(.*)***REMOVED***=([^;]*)(.*)", "\2");
+      set req.http.X-Customer-Type = regsuball(req.http.Cookie, "(.*)***REMOVED***=([^;]*)(.*)", "\2");
+    }
+    if (req.http.Cookie ~ "***REMOVED***") {
+      set req.http.X-Outdated-Browser = regsuball(req.http.Cookie, "(.*)***REMOVED***=([^;]*)(.*)", "\2");
+    }
+  }
+{% endif %}
+
+{% if varnish_cookie_sanitization_enabled %}
+  ###
+  # Cookie Sanitization
+  ###
+  if (req.http.Cookie) {
+    set req.http.X-Cookie-Unmodified = req.http.Cookie;
+
+  {% for cookie in varnish_cookie_sanitization_blacklist %}
+    set req.http.Cookie = regsuball(req.http.Cookie, "{{ cookie }}=[^;]+(; )?", "");
+  {% endfor %}
+
+    ### General Cleanup
+    set req.http.Cookie = regsuball(req.http.Cookie, "^;\s*", "");
+    if (req.http.Cookie ~ "^\s*$") {
+        unset req.http.Cookie;
+    }
+    if (req.http.Cookie) {
+      set req.http.X-Cookie-Sanitized = req.http.Cookie;
     }
   }
 {% endif %}
