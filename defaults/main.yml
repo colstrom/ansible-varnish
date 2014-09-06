@@ -113,6 +113,8 @@ varnish_cookie_sanitization_blacklist:
   - ***REMOVED***
   - ***REMOVED***
   - ***REMOVED***
+  - ***REMOVED***
+  - ***REMOVED***
 
 varnish_uri_sanitization_enabled: "{{ varnish_request_sanitization_enabled }}"
 varnish_uri_sanitization_regexp: '(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl)'
