@@ -103,7 +103,7 @@ sub vcl_recv {
     set req.http.X-Cookie-Unmodified = req.http.Cookie;
 
   {% for cookie in varnish_cookie_sanitization_blacklist %}
-    set req.http.Cookie = regsuball(req.http.Cookie, "{{ cookie }}=[^;]+(; )?", "");
+#    set req.http.Cookie = regsuball(req.http.Cookie, "{{ cookie }}=[^;]+(; )?", "");
   {% endfor %}
 
     ### General Cleanup
