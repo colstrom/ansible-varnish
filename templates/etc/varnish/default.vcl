@@ -109,6 +109,7 @@ sub vcl_recv {
     ### General Cleanup
     set req.http.Cookie = regsuball(req.http.Cookie, "^;\s*", "");
     if (req.http.Cookie ~ "^\s*$") {
+        set req.http.X-Cookie-Discarded = "YES";
         unset req.http.Cookie;
     }
     if (req.http.Cookie) {
@@ -256,6 +257,7 @@ sub vcl_recv {
 {% endif %}
 
 {% if varnish_cookie_sanitization_discard_from_client %}
+    set req.http.X-Cookie-Discarded = "YES";
     unset req.http.Cookie;
 {% endif %}
 }
