@@ -179,16 +179,16 @@ sub vcl_recv {
       set req.http.X-Geolocation-Found = "YES:BrowserProfile";
 
       if (req.http.X-Geolocation ~ "country") {
-        set req.http.X-Geolocation-Country = regsuball(req.http.X-BrowserProfile-Geolocation, "(.*)country\\.:\\.([^\\]*)(.*)", "\2");
+        set req.http.X-Geolocation-Country = regsuball(req.http.X-Geolocation, "(.*)country\\.:\\.([^\\]*)(.*)", "\2");
       }
       if (req.http.X-Geolocation ~ "region") {
-        set req.http.X-Geolocation-Region = regsuball(req.http.X-BrowserProfile-Geolocation, "(.*)region\\.:\\.([^\\]*)(.*)", "\2");
+        set req.http.X-Geolocation-Region = regsuball(req.http.X-Geolocation, "(.*)region\\.:\\.([^\\]*)(.*)", "\2");
       }
       if (req.http.X-Geolocation ~ "city") {
-        set req.http.X-Geolocation-City = regsuball(req.http.X-BrowserProfile-Geolocation, "(.*)city\\.:\\.([^\\]*)(.*)", "\2");
+        set req.http.X-Geolocation-City = regsuball(req.http.X-Geolocation, "(.*)city\\.:\\.([^\\]*)(.*)", "\2");
       }
       if (req.http.X-Geolocation ~ "isp") {
-        set req.http.X-Geolocation-ISP = regsuball(req.http.X-BrowserProfile-Geolocation, "(.*)isp\\.:\\.([^\\]*)(.*)", "\2");
+        set req.http.X-Geolocation-ISP = regsuball(req.http.X-Geolocation, "(.*)isp\\.:\\.([^\\]*)(.*)", "\2");
       }
     } else {
       set req.http.X-Geolocation-Found = "NO";
