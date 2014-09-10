@@ -123,7 +123,7 @@ varnish_cookie_sanitization_blacklist:
   - ***REMOVED***
 
 varnish_uri_sanitization_enabled: "{{ varnish_request_sanitization_enabled }}"
-varnish_uri_sanitization_regexp: '(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl|INTCMP|CMP|SEM_CMP|SEM_AG|SEM_MT|SEM_META)'
+varnish_uri_sanitization_regexp: '(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl|SEM_CMP|SEM_AG|SEM_MT|SEM_META)'
 
 varnish_uri_blacklist_enabled: no
 varnish_uri_blacklist_regexp: '^dont_cache_me_bro$'
