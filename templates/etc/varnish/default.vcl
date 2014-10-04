@@ -1,5 +1,7 @@
 vcl 4.0;
 
+# {{ ansible_managed }}
+
 import directors;
 import std;
 
