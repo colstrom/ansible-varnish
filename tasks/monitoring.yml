@@ -30,8 +30,3 @@
 
 - name: Trigger All Callbacks
   meta: flush_handlers
-
-- name: Confirm Monitoring | varnish
-  monit:
-    state: present
-    name: varnish
