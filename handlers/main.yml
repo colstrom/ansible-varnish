@@ -7,5 +7,5 @@
     state: restarted
     name: varnish
   tags:
-    - monit
+    - using-monit
     - disruptive
