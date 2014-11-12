@@ -5,10 +5,3 @@
     pkg: "{{ item }}"
   with_items:
     - varnish
-
-- name: Service Stopped | varnish
-  service:
-    name: varnish
-    state: stopped
-  tags:
-    - disruptive
