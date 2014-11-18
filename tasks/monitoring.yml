@@ -11,12 +11,6 @@
     - runtime-data
     - varnish
 
-- name: Upload Config | monit | varnish
-  template:
-    src: etc/monit/conf.d/varnish
-    dest: /etc/monit/conf.d/varnish
-  notify: Reload Service | monit
-
 - name: Configure | varnish | initscript | pidfile
   replace:
     dest: /etc/init.d/varnish
@@ -27,6 +21,3 @@
     - runtime-data
     - pidfile
     - varnish
-
-- name: Trigger All Callbacks
-  meta: flush_handlers
