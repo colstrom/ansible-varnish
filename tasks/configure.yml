@@ -10,3 +10,5 @@
     - etc/default/varnish
     - etc/varnish/default.vcl
   notify: Reload Service | varnish
+  tags:
+    - varnish
