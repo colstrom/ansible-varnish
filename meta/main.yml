@@ -5,4 +5,3 @@ dependencies:
     repository_url: 'deb http://repo.varnish-cache.org/ubuntu/ precise varnish-4.0'
   - role: meta/monitor
     monitor_name: varnish
-    monitor_pidfile: "{{ varnish_pidfile_path }}"

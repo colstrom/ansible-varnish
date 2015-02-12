@@ -1,4 +1,27 @@
 ---
+- name: "Directory Exists | {{ varnish_runtime_root }}"
+  file:
+    state: directory
+    path: "{{ varnish_runtime_root }}"
+    owner: root
+    group: wcadmin
+    mode: 0775
+  tags:
+    - directory-structure
+    - runtime-data
+    - varnish
+
+- name: Configure | varnish | initscript | pidfile
+  replace:
+    dest: /etc/init.d/varnish
+    regexp: '/var/run/\$NAME.pid'
+    replace: "{{ varnish_pidfile_path }}"
+  tags:
+    - initscript
+    - runtime-data
+    - pidfile
+    - varnish
+
 - name: Upload Files | varnish
   template:
     src: "{{ item }}"
