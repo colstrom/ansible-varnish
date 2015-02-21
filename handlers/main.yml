@@ -1,11 +1,7 @@
 ---
-- name: Reload Service | monit
-  command: monit reload
-
 - name: Reload Service | varnish
-  monit:
-    state: restarted
+  service:
+    state: reloaded
     name: varnish
   tags:
-    - using-monit
     - disruptive
