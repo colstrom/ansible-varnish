@@ -3,3 +3,15 @@ dependencies:
   - role: telusdigital.apt-repository
     repository_key: "0x60e7c096c4deffeb"
     repository_url: "deb http://repo.varnish-cache.org/ubuntu/ precise varnish-4.0"
+galaxy_info:
+  author: "Chris Olstrom"
+  company: "TELUS digital"
+  description: "Varnish Cache, the high-performance HTTP accelerator."
+  license: MIT
+  platforms:
+    - name: Ubuntu
+      versions:
+      - precise
+      - trusty
+  categories:
+    - web
