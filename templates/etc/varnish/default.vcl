@@ -245,15 +245,15 @@ sub vcl_recv {
   }
 
   if (req.http.Cookie) {
-    if (req.http.Cookie ~ "***REMOVED***") {
-      set req.http.X-Screen-Resolution = regsuball(req.http.Cookie, "(.*)***REMOVED***=([^;]*)(.*)", "\2");
+    if (req.http.Cookie ~ "resolution") {
+      set req.http.X-Screen-Resolution = regsuball(req.http.Cookie, "(.*)resolution=([^;]*)(.*)", "\2");
     }
 
-    if (req.http.Cookie ~ "***REMOVED***") {
-      set req.http.X-Customer-Type = regsuball(req.http.Cookie, "(.*)***REMOVED***=([^;]*)(.*)", "\2");
+    if (req.http.Cookie ~ "CustomerType") {
+      set req.http.X-Customer-Type = regsuball(req.http.Cookie, "(.*)CustomerType=([^;]*)(.*)", "\2");
     }
-    if (req.http.Cookie ~ "***REMOVED***") {
-      set req.http.X-Outdated-Browser = regsuball(req.http.Cookie, "(.*)***REMOVED***=([^;]*)(.*)", "\2");
+    if (req.http.Cookie ~ "outdated-browser-notification") {
+      set req.http.X-Outdated-Browser = regsuball(req.http.Cookie, "(.*)outdated-browser-notification=([^;]*)(.*)", "\2");
     }
   }
 {% endif %}

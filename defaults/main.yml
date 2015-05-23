@@ -63,64 +63,7 @@ varnish_header_sanitization_normalize_accept_encoding: "{{ varnish_header_saniti
 varnish_cookie_sanitization_enabled: "{{ varnish_request_sanitization_enabled }}"
 varnish_cookie_sanitization_discard_from_client: yes
 varnish_cookie_sanitization_discard_from_server: yes
-varnish_cookie_sanitization_blacklist: 
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
-  - ***REMOVED***
+varnish_cookie_sanitization_blacklist: []
 
 varnish_uri_sanitization_enabled: "{{ varnish_request_sanitization_enabled }}"
 varnish_uri_sanitization_regexp: '(utm_source|utm_medium|utm_campaign|gclid|cx|ie|cof|siteurl|SEM_CMP|SEM_AG|SEM_MT|SEM_META|SEM_VT)'
