@@ -3,5 +3,3 @@ dependencies:
   - role: meta/repository
     repository_key: '0x60e7c096c4deffeb'
     repository_url: 'deb http://repo.varnish-cache.org/ubuntu/ precise varnish-4.0'
-  - role: meta/monitor
-    monitor_name: varnish
