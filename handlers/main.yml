@@ -1,7 +1,20 @@
 ---
-- name: Reload Service | varnish
+- name: service | varnish | started
   service:
-    state: reloaded
     name: varnish
-  tags:
-    - disruptive
+    state: started
+
+- name: service | varnish | stopped
+  service:
+    name: varnish
+    state: stopped
+
+- name: service | varnish | restarted
+  service:
+    name: varnish
+    state: restarted
+
+- name: service | varnish | reloaded
+  service:
+    name: varnish
+    state: reloaded
