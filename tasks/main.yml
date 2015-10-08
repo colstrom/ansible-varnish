@@ -1,3 +1,21 @@
 ---
-- include: install.yml
-- include: configure.yml
+- apt:
+    state: latest
+    pkg: "{{ item }}"
+  with_items:
+  - varnish
+  tags:
+  - varnish
+
+- template:
+    src: "{{ item }}"
+    dest: "/{{ item }}"
+    owner: root
+    group: staff
+    mode: 0664
+  with_items:
+  - etc/default/varnish
+  - etc/varnish/default.vcl
+  notify: service | varnish | reload
+  tags:
+    - varnish

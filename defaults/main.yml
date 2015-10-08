@@ -2,9 +2,6 @@
 varnish_user: varnish
 varnish_group: varnish
 
-varnish_runtime_root: "{{ runtime_root | default('/var/run') }}/varnish"
-varnish_pidfile_path: "{{ varnish_runtime_root }}/varnish.pid"
-
 varnish_default_backend_host: localhost
 varnish_default_backend_port: 80
 varnish_default_backend_ttl: 120

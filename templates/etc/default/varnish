@@ -11,7 +11,6 @@ INSTANCE=$(uname -n)
 DAEMON_OPTS=" -a {% if not varnish_accepts_external_connections %}localhost{% endif %}:{{ varnish_listen_port }} \
               {% if varnish_using_vcl %}-f {{ varnish_vcl_path }}{% else %}-b {{ varnish_default_backend_host }}:{{ varnish_default_backend_port }}{% endif %} \
               -u {{ varnish_user }} -g {{ varnish_group }} \
-              -P {{ varnish_pidfile_path }} \
               -p thread_pools={{ varnish_thread_pools }} \
               -p thread_pool_add_delay={{ varnish_thread_pool_add_delay }} \
               -p thread_pool_min={{ varnish_thread_pool_min }} \
