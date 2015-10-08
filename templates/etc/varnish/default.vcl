@@ -47,7 +47,7 @@ sub vcl_init {
 ###
 # vcl_recv
 #   Called at the beginning of a request, after the complete request has been received and parsed.
-#   Its purpose is to decide whether or not to serve the request, how to do it, and, if applicable, which backend to use. 
+#   Its purpose is to decide whether or not to serve the request, how to do it, and, if applicable, which backend to use.
 #   It is also used to modify the request
 ###
 # The vcl_recv subroutine may terminate with calling return() on one of the following keywords:
@@ -149,7 +149,7 @@ sub vcl_recv {
   ###
   # URI Sanitization
   ###
-  
+
   if (req.url ~ "(\?|&){{ varnish_uri_sanitization_regexp }}=") {
     set req.url = regsuball(req.url, "&{{ varnish_uri_sanitization_regexp }}=([A-z0-9_\-\.%25]+)", "");
     set req.url = regsuball(req.url, "\?{{ varnish_uri_sanitization_regexp }}=([A-z0-9_\-\.%25]+)", "?");
