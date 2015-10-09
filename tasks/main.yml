@@ -16,6 +16,6 @@
   with_items:
   - etc/default/varnish
   - etc/varnish/default.vcl
-  notify: service | varnish | reloaded
+  notify: service | varnish | restarted
   tags:
     - varnish
